@@ -1,0 +1,36 @@
+version: 2.1  # Definindo a versão da configuração do CircleCI
+
+executors:
+  node-executor:
+    docker:
+      - image: circleci/python:3.7  # Utilizando uma imagem Docker com o ambiente Python
+    working_directory: ~/repo  # Diretório de trabalho
+
+jobs:
+  install_dependencies:
+    executor: node-executor
+    steps:
+      - checkout  # Baixa o código do repositório
+      - run:
+          name: Instalar dependências
+          command: |
+            curl -sL https://deb.nodesource.com/setup_14.x | bash -
+            apt-get install -y nodejs
+            npm install  # Instala as dependências do Node.js
+
+  test:
+    executor: node-executor
+    steps:
+      - checkout
+      - run:
+          name: Rodar testes
+          command: npm test
+
+workflows:
+  version: 2
+  build_and_test:
+    jobs:
+      - install_dependencies
+      - test:
+          requires:
+            - install_dependencies
